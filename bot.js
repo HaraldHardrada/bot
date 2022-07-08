@@ -1,44 +1,22 @@
-//разобраться с Heroku
-//добавить кнопочки
+/*
+TODO: - отрефакторить код
+      - вынести commands, help, on в отдельный файл
+      - экспортировать команды в bot.js
+TODO: - разобраться с Heroku
+TODO: - настроить кнопки
+TODO: - добавить кнопку back
+TODO: - добавить кнопку next
+TODO: - добавить обработку введеного юзером кода
+ */
+const {Telegraf, Markup} = require('telegraf')
+const bot = new Telegraf(process.env.BOT_TOKEN)
 
-const {getCurrency, getAllCurrencies} = require('./requests')
-const CURRENCIES = require('./currencies')
-const {Telegraf} = require('telegraf')
-const bot = new Telegraf('5526237425:AAGvXllTL-KG1PG1yC8Yw92vQpkOqkyI2Zo')
-
-//добавляю команды боту, вынести commands, help, on
-bot.command('get_crypto', async (ctx) => {
-
-    ctx.reply('Command is temporally not available')
-    // const response = await getCurrency();
-    // ctx.reply(`BTC rate: ${response.toFixed(4)}`)
-})
-bot.command('get_all_crypto', async (ctx) => {
-    //пробежаться по результату и вернуть кал, который присутствует в массиве CURRENCIES
-    const response = await getAllCurrencies();
-    ctx.reply(`${response}`)
-})
-
-bot.command('stop', async (ctx) => {
-
-    ctx.reply('You\'ve stopped the bot').then(bot.stop())
-})
-
-bot.start((ctx) => ctx.reply(`${ctx.message.from.first_name}, crypto?`))
-
-//записываю команды и их описание в команду /help
-bot.help((ctx) => ctx.reply(
-    '/get_crypto - returns rates of all available crypto currencies'
-))
-
-//добавить шоб текст читался нормально (toUpperCase, например)
-bot.on('text', async (ctx) => {
-    const text = ctx.update.message.text;
-    if (CURRENCIES.includes(text)) {
-        const response = await getCurrency(text);
-        return ctx.reply(`${text} rate: ${response.toFixed(4)} usd`)
+bot.start(async (ctx) => {
+    try {
+        await ctx.reply('I want to get crypto rate', Markup.keyboard([['Show me all'], ['Show me chosen', 'Subscribed']]).resize())
+    } catch (error) {
+        console.log(error)
     }
-    return ctx.reply('Пошел нахуй');
 })
 
 bot.launch();
