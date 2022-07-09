@@ -1,7 +1,7 @@
 const CURRENCIES = require("../currencies");
 const {Markup} = require("telegraf");
 const {getAllCurrencies} = require("../requests");
-const bot = require("commands")
+const {bot} = require("commands")
 const startMenu = [['Show me all'], ['Show me chosen', 'Subscribed']];
 
 const buttons = CURRENCIES.map(item => new Array(item))

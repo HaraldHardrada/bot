@@ -12,7 +12,7 @@ TODO  - обернуть все команды и кнопки в try...catch
  */
 
 const {Markup} = require('telegraf')
-const bot = require('/control/commands.js')
+const {bot} = require('/control/commands.js')
 const startMenu = require('/control/buttons.js');
 
 bot.start(async (ctx) => {
