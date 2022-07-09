@@ -1,28 +1,11 @@
-/*
-TODO: - отрефакторить код
-      - вынести control, help, on в отдельный файл
-      - экспортировать команды в bot.js
-TODO: - разобраться с Heroku
-TODO: - настроить кнопки
-        -Subscribed
-TODO: - добавить кнопку next
-TODO: - добавить обработку введеного юзером текста
-TODO: - дописать /help
-TODO  - обернуть все команды и кнопки в try...catch
- */
+const {Markup, Telegraf} = require('telegraf')
 
-const {Markup} = require('telegraf')
-const {bot} = require('/control/commands.js')
-const startMenu = require('/control/buttons.js');
+const {bot, START_MENU} = require('./control/commands.js')
 
-bot.start(async (ctx) => {
-    try {
-        await ctx.reply('I want to get crypto rate', Markup.keyboard(startMenu).resize())
-    } catch (error) {
-        console.log(error)
-    }
-})
+// console.log(`bot: ${JSON.stringify(bot, '' , 3)}`)
+bot.start(ctx => ctx.reply('I want to get crypto rate', Markup.keyboard(START_MENU).resize()))
 
 bot.launch();
+
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
