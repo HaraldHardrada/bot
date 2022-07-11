@@ -6,7 +6,6 @@ const CURRENCIES = require("../currencies");
 const bot = new Telegraf('5526237425:AAGvXllTL-KG1PG1yC8Yw92vQpkOqkyI2Zo');
 const START_MENU = [['Show me all'], ['Show me chosen', 'Subscribed']];
 const buttons = CURRENCIES.map(item => new Array(item)).concat([['back']])
-console.log(buttons)
 
 bot.hears('Show me chosen', ctx => ctx.reply('Choose the option', Markup.keyboard(buttons)))
 bot.hears('back', ctx => ctx.reply('Went back', Markup.keyboard(START_MENU).resize()))

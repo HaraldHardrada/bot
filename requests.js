@@ -1,30 +1,37 @@
-const axios = require('./axios')
+const {Axios, changeApiKey} = require('./axios')
 
 const express = require('express');
 const CURRENCIES = require("./currencies");
 const app = express(); //поместить на Heroku
-let count = 0;
+
+
+function fixErrors(error){
+    if (error.response === 429) changeApiKey();
+    if (error.request) console.log(error.request);
+    console.log('Error', error.message);
+    console.log(error.config)
+}
+
 
 const getCurrency = async (text) => {
     try {
-        const result = await axios.get(`/exchangerate/${text}/USD`)
-        count++;
+        const result = await Axios.get(`/exchangerate/${text}/USD`)
         return result.data.rate;
     } catch (error) {
-        console.log(error);
+        changeApiKey()
+        console.log(error)
     }
 };
 
 const getAllCurrencies = async () => {
     try {
-        const result = await axios.get(`/assets`);
-        count++;
+        const result = await Axios.get(`/assets`);
         return  result.data.filter((item) => CURRENCIES.includes(item.asset_id))
             .map((item) => `${item.asset_id}: ${item.price_usd.toFixed(4)} usd`)
             .join("\n");
     } catch (error) {
-        console.log(error);
+        fixErrors(error);
     }
 };
 
-module.exports = {getCurrency, getAllCurrencies, count}
+module.exports = {getCurrency, getAllCurrencies}
