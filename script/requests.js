@@ -1,7 +1,7 @@
 const axios = require('./axios')
 const CURRENCIES = require("./currencies");
-
 const {userCurrencies} = require("./bot_control/commands")
+const db = require('./db')
 
 const getCurrency = async (text) => {
     try {
@@ -25,16 +25,23 @@ const getAllCurrencies = async () => {
     }
 };
 
-const getSubCurrencies = async () => {
-    console.log('in function', userCurrencies);
-    if (userCurrencies.length === 0) return;
+const getSubCurrencies = async ctx => {
 
+    const userId = +ctx.update.callback_query.from.id
+    const request = await db.query(`SELECT * FROM currencies WHERE user_id = $1`, [userId])
+    const userCurrencies = request.rows.map(item => item.symbol)
+
+    if (userCurrencies.length === 0) return;
     try {
+
         const result = await axios.get(`/assets`);
 
-        return result.data.filter((item) => userCurrencies.includes(item.asset_id))
+        const userRequest = result.data.filter((item) => userCurrencies.includes(item.asset_id))
             .map((item) => `${item.asset_id}: ${item.price_usd.toFixed(4)} usd`)
-            .join("\n");
+            .join("\n")
+
+        return ctx.reply(`List of currencies: \n${userRequest}`);
+
     } catch (error) {
         console.log(error);
     }

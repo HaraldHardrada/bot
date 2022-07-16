@@ -1,10 +1,9 @@
 const {Markup, Telegraf} = require("telegraf");
+const cron = require('node-cron');
 
-const {getAllCurrencies, getCurrency} = require("../requests");
+const {getAllCurrencies, getCurrency, getSubCurrencies} = require("../requests");
 const CURRENCIES = require("../currencies");
 const db = require('../db')
-
-const {sendSub} = require("./callbacks")
 
 const bot = new Telegraf('5526237425:AAGvXllTL-KG1PG1yC8Yw92vQpkOqkyI2Zo');
 const START_MENU = [['Show me all'], ['Show me chosen', 'Subscribed']];
@@ -17,11 +16,13 @@ bot.hears('Show me all', async ctx => ctx.reply(`${await getAllCurrencies()}`))
 
 bot.action('sub', async ctx => {
     try {
-        const symbol = ctx.update.callback_query.message.text.slice(0, 3)
+        const symbol = CURRENCIES.map(item => ctx.update.callback_query.message.text.match(item)).join('')
+        console.log(symbol);
         const userId = +ctx.update.callback_query.from.id
         const check = await db.query(`SELECT * FROM currencies WHERE user_id = $1 AND symbol = $2`, [userId, symbol]);
 
-
+        //10,19: 10:00, 19:00
+        cron.schedule("* 10,19 * * *", async () => await getSubCurrencies(ctx))
         if (check.rows.length !== 0) return ctx.reply('Already subscribed')
 
         ctx.reply('You will receive rate of this currency everyday at 10:00 AM and 07:00 PM')
@@ -30,7 +31,6 @@ bot.action('sub', async ctx => {
     } catch (error) {
         console.log(error);
     }
-    //await sendSub.start();
 })
 
 bot.help((ctx) => ctx.reply('/get_crypto - returns rates of all available crypto currencies'))
@@ -51,7 +51,6 @@ bot.command('stop', ctx => ctx.reply('You\'ve stopped the bot').then(bot.stop())
 
 //добавить шоб текст читался нормально (toUpperCase, например)
 bot.on('text', async (ctx) => {
-    console.log(ctx.update.message)
     try {
         const text = ctx.update.message.text;
         if (CURRENCIES.includes(text)) {
