@@ -1,6 +1,5 @@
 const axios = require('./axios')
 const CURRENCIES = require("./currencies");
-const {userCurrencies} = require("./bot_control/commands")
 const db = require('./db')
 
 const getCurrency = async (text) => {
