@@ -1,7 +1,7 @@
 const {Markup, Telegraf} = require("telegraf");
 const cron = require("node-cron");
 
-const {bot} = require('../bot')
+const {bot, START_MENU} = require('../bot')
 const CurrencyController = require("../controller/currency.controller");
 const UserController = require("../controller/user.controller");
 const {getSubCurrencies, getCurrency} = require("../requests");
@@ -15,15 +15,15 @@ const startSchedule = (cronFields, func, args) => {
 
 const subscribe = async ctx => {
     try {
-        //sends client's subscriptions list at 10:00 and 19:00 every day
-        startSchedule("0 10,19 * * *", getSubCurrencies, ctx);
+        //sends client's subscriptions list at 10:00 and 19:00 every day "0 10,19 * * *"
+        startSchedule("*/5 * * * * *", getSubCurrencies, ctx);
 
         const isSubscribed = await CurrencyController.checkSubscription(ctx);
 
         if (isSubscribed) return ctx.reply("Already subscribed")
 
         //TODO: - сдлеать, чтоб после подписки кнопка менялась на "unsubscribe"
-        //        - или чтобы при последующих запросах на одну и ту же валюту приходила кнопка 'unsubscribe'
+        //      - или чтобы при последующих запросах на одну и ту же валюту приходила кнопка 'unsubscribe'
         ctx.reply("You will receive rate of this currency everyday at 10:00 AM and 07:00 PM");
 
         await CurrencyController.addCurrency(ctx);
@@ -33,7 +33,6 @@ const subscribe = async ctx => {
 };
 
 //commands
-const START_MENU = [['Show me all'], ['Show me chosen', 'Subscribed']];
 
 const start = async ctx => {
     ctx.reply("Hello", Markup.keyboard(START_MENU).resize());
@@ -50,9 +49,8 @@ const start = async ctx => {
 const stop = async ctx => {
     ctx.reply('Your account was deleted and all subscriptions was cancelled')
 
-    await CurrencyController.deleteUserCurrencies(ctx) //deletes user's subscriptions from database
-    await UserController.deleteUser(ctx)   //deletes user from database
-
+    await CurrencyController.deleteUserCurrencies(ctx)
+    await UserController.deleteUser(ctx)
 };
 
 //bot.on
@@ -67,8 +65,6 @@ const turnedOn = async ctx => {
             ))
     }
     return ctx.reply('Doesn\'t exists');
-
 }
-
 
 module.exports = {subscribe, start, stop, turnedOn};

@@ -11,11 +11,11 @@ class CurrencyController {
         return console.log(`currency was successfully added to user ${userId}`)
     }
 
-    async getCurrenciesByUser(req, res) {
-        const id = req.query.id;
-        const currencies = await db.query(`SELECT * FROM currencies WHERE user_id = $1`, [id]);
-        res.json(currencies.rows)
+    async getCurrenciesByUser(ctx) {
+        const userId = +ctx.update.callback_query.from.id
+        const request = await db.query(`SELECT * FROM currencies WHERE user_id = $1`, [userId])
 
+        return request.rows.map(item => item.symbol)
     }
 
     async deleteUserCurrencies(ctx) {

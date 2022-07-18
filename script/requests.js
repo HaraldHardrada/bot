@@ -1,6 +1,8 @@
 const axios = require('./axios')
 const CURRENCIES = require("./currencies");
-const db = require('./db')
+const currencyController = require('./controller/currency.controller')
+
+const {filterRequest} = require('./helpers/arrays')
 
 const getCurrency = async (text) => {
     try {
@@ -14,37 +16,28 @@ const getCurrency = async (text) => {
 
 const getAllCurrencies = async () => {
     try {
-        const result = await axios.get(`/assets`);
+        const request = await axios.get(`/assets`);
 
-        return result.data.filter((item) => CURRENCIES.includes(item.asset_id))
-            .map((item) => `${item.asset_id}: ${item.price_usd.toFixed(4)} usd`)
-            .join("\n");
+        return filterRequest(request, CURRENCIES);
     } catch (error) {
         console.log(error);
     }
 };
 
 const getSubCurrencies = async ctx => {
-
-    const userId = +ctx.update.callback_query.from.id
-    const request = await db.query(`SELECT * FROM currencies WHERE user_id = $1`, [userId])
-    const userCurrencies = request.rows.map(item => item.symbol)
-
-    if (userCurrencies.length === 0) return;
-
     try {
-        const result = await axios.get(`/assets`);
+        const userCurrencies = await currencyController.getCurrenciesByUser(ctx);
 
-        //TODO: создать папку helpers и вынести туда в файл вот эту функцию
-        const userRequest = result.data.filter((item) => userCurrencies.includes(item.asset_id))
-            .map((item) => `${item.asset_id}: ${item.price_usd.toFixed(4)} usd`)
-            .join("\n")
+        if (userCurrencies.length === 0) return;
 
-        return ctx.reply(`List of currencies: \n${userRequest}`);
+        const request = await axios.get(`/assets`);
+        const userSubscriptions = filterRequest(request, userCurrencies);
+
+        return ctx.reply(`List of currencies: \n${userSubscriptions}`);
 
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 module.exports = {getCurrency, getAllCurrencies, getSubCurrencies}
