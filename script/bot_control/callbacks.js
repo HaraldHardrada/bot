@@ -1,12 +1,18 @@
-const {Markup, Telegraf} = require("telegraf");
+const {Markup} = require("telegraf");
 const cron = require("node-cron");
 
-const {bot, START_MENU} = require('../bot')
 const CurrencyController = require("../controller/currency.controller");
 const UserController = require("../controller/user.controller");
-const {getSubCurrencies, getCurrency} = require("../requests");
+const {getSubCurrencies, getCurrency, getAllCurrencies} = require("../requests");
 const CURRENCIES = require("../currencies");
 
+const START_MENU = Markup.keyboard([[
+        Markup.button.callback('Show me all', 'showAll'),
+        ['Show me chosen']
+    ], [
+        Markup.button.callback('Subscribed', 'subscribed'),
+    ]]
+).resize();
 
 //subscription
 const startSchedule = (cronFields, func, args) => {
@@ -35,7 +41,7 @@ const subscribe = async ctx => {
 //commands
 
 const start = async ctx => {
-    ctx.reply("Hello", Markup.keyboard(START_MENU).resize());
+    ctx.reply("Hello", START_MENU);
 
     try {
         await UserController.createUser(ctx);
@@ -53,6 +59,22 @@ const stop = async ctx => {
     await UserController.deleteUser(ctx)
 };
 
+const getAllRates = async ctx => ctx.reply(await getAllCurrencies());
+
+//actions
+//TODO: - сделать, чтоб кнопок было по 3 в ряду и переделать добавление back
+const buttons = CURRENCIES.map(item => new Array(item)).concat([['back']])
+
+//Fixme: - не работает в формате action
+const showChosen = ctx => {
+    ctx.reply('Choose the option', Markup.keyboard(buttons))
+};
+
+//Fixme: - Error 400 ' Bad Request: can't parse keyboard button: KeyboardButton must be a String or an Object'
+const goBack = ctx => ctx.reply('back', START_MENU);
+
+const showAll = async ctx => ctx.reply(await getAllCurrencies());
+
 //bot.on
 //TODO: - добавить шоб текст читался нормально (toUpperCase, например)
 const turnedOn = async ctx => {
@@ -67,4 +89,4 @@ const turnedOn = async ctx => {
     return ctx.reply('Doesn\'t exists');
 }
 
-module.exports = {subscribe, start, stop, turnedOn};
+module.exports = {subscribe, start, stop, getAllRates, showChosen, goBack, showAll, turnedOn};
