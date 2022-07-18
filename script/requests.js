@@ -31,10 +31,11 @@ const getSubCurrencies = async ctx => {
     const userCurrencies = request.rows.map(item => item.symbol)
 
     if (userCurrencies.length === 0) return;
-    try {
 
+    try {
         const result = await axios.get(`/assets`);
 
+        //TODO: создать папку helpers и вынести туда в файл вот эту функцию
         const userRequest = result.data.filter((item) => userCurrencies.includes(item.asset_id))
             .map((item) => `${item.asset_id}: ${item.price_usd.toFixed(4)} usd`)
             .join("\n")
