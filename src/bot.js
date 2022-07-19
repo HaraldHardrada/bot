@@ -1,6 +1,6 @@
 const express = require('express');
 
-const {bot} = require('./bot_control/commands.js')
+const {bot} = require('./bot_control/control.js')
 const userRouter = require('./routes/user.routes')
 const currencyRouter = require('./routes/currency.routes')
 

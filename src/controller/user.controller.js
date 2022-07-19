@@ -20,15 +20,6 @@ class UserController {
         res.json(user.rows);
     }
 
-    async updateUser(req, res) {
-        const {id, name, telegram_id} = req.body;
-        const user = await db.query(
-            "UPDATE person set name = $1, telegram_id = $2 where id = $3 RETURNING *",
-            [name, telegram_id, id]
-        );
-        res.json(user.rows);
-    }
-
     async deleteUser(ctx) {
         const telegram_id = +ctx.update.message.from.id;
         await db.query("DELETE FROM person where telegram_id = $1", [telegram_id]);
