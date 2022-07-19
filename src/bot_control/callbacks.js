@@ -6,13 +6,9 @@ const UserController = require("../controller/user.controller");
 const {getSubCurrencies, getCurrency, getAllCurrencies} = require("../requests");
 const CURRENCIES = require("../currencies");
 
-const START_MENU = Markup.keyboard([[
-        Markup.button.callback('Show me all', 'showAll'),
-        ['Show me chosen']
-    ], [
-        Markup.button.callback('Subscribed', 'subscribed'),
-    ]]
-).resize();
+const START_MENU = Markup.keyboard([['Show all', 'Choose'], ['Subscribed']]).resize()
+//TODO: - сделать, чтоб кнопок было по 3 в ряду
+const buttons = CURRENCIES.map(item => new Array(item)).concat([['back']])
 
 //subscription
 const startSchedule = (cronFields, func, args) => {
@@ -50,7 +46,7 @@ const start = async ctx => {
     }
 };
 
-//Fixme: - сделать, чтоб бот нормально останавливался у юзера при нажатии команды stop
+// Fixme: - сделать, чтоб бот нормально останавливался у юзера при нажатии команды stop
 //       - можно сделать вручную кнопку restart, главное, чтоб бот нормально заканчивал какашку
 const stop = async ctx => {
     ctx.reply('Your account was deleted and all subscriptions was cancelled')
@@ -61,19 +57,11 @@ const stop = async ctx => {
 
 const getAllRates = async ctx => ctx.reply(await getAllCurrencies());
 
-//actions
-//TODO: - сделать, чтоб кнопок было по 3 в ряду и переделать добавление back
-const buttons = CURRENCIES.map(item => new Array(item)).concat([['back']])
-
-//Fixme: - не работает в формате action
 const showChosen = ctx => {
     ctx.reply('Choose the option', Markup.keyboard(buttons))
 };
 
-//Fixme: - Error 400 ' Bad Request: can't parse keyboard button: KeyboardButton must be a String or an Object'
-const goBack = ctx => ctx.reply('back', START_MENU);
-
-const showAll = async ctx => ctx.reply(await getAllCurrencies());
+const goBack = ctx => ctx.reply('back️', START_MENU);
 
 //bot.on
 //TODO: - добавить шоб текст читался нормально (toUpperCase, например)
@@ -89,4 +77,4 @@ const turnedOn = async ctx => {
     return ctx.reply('Doesn\'t exists');
 }
 
-module.exports = {subscribe, start, stop, getAllRates, showChosen, goBack, showAll, turnedOn};
+module.exports = {subscribe, start, stop, getAllRates, showChosen, goBack, turnedOn};

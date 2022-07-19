@@ -4,8 +4,8 @@
   "description": "Telegram bot that return current rate of chosen crypto ",
   "main": "request.js",
   "scripts": {
-    "start": "node script/bot.js",
-    "dev": "nodemon script/bot.js"
+    "dev": "nodemon src/bot.js",
+    "start": "node src/bot.js"
   },
   "author": "Lozovyi Vadym <vadymlozovoi@gmail.com>",
   "license": "ISC",
