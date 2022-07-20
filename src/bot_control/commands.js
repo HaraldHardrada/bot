@@ -44,6 +44,7 @@ const goBack = ctx => ctx.reply('back', START_MENU);
 const turnedOn = async ctx => {
     const text = ctx.update.message.text;
     if (CURRENCIES.includes(text)) {
+        ``
         const response = await getCurrency(text);
         return ctx.replyWithHTML(`${text} rate: ${response.toFixed(4)} usd`,
             await UserSubscriptions.getButtonBySubStatus(ctx))

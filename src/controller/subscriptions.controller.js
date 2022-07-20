@@ -36,7 +36,7 @@ class UserSubscriptions {
 
     async getButtonBySubStatus(ctx) {
         let button = Markup.inlineKeyboard([Markup.button.callback('Unsubscribe', 'unSub')])
-        const isSubscribed = await CurrencyController.checkSubscription(ctx, 'message')
+        const isSubscribed = await CurrencyController.checkSubscription(ctx)
 
         if (!isSubscribed) button = Markup.inlineKeyboard([Markup.button.callback('Subscribe', 'sub')])
         return button;
