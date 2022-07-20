@@ -4,12 +4,12 @@ const {bot} = require('./bot_control/control.js')
 const userRouter = require('./routes/user.routes')
 const currencyRouter = require('./routes/currency.routes')
 
-const PORT = process.env.PORT || 8080
+const PORT = process.env.PORT || 5432
 const app = express()
 
 app.use(express.json())
-app.use('/bot', userRouter)
-app.use('/bot', currencyRouter)
+app.use('/crypto-rates-bot', userRouter)
+app.use('/crypto-rates-bot', currencyRouter)
 
 
 app.listen(PORT, () => console.log(`server has been started on port ${PORT}`))

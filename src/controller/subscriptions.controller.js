@@ -25,6 +25,7 @@ class UserSubscriptions {
         }
     }
 
+    //TODO: - переделать на inline_keyboard
     async getSubscriptions(ctx) {
         try {
             const userSubscriptions = await CurrencyController.getCurrenciesByUser(ctx);
