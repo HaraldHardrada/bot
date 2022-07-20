@@ -11,9 +11,9 @@ class UserSubscriptions {
             //sends client's subscriptions list at 10:00 and 19:00 every day "0 10,19 * * *"
             startSchedule("0 10,19 * * *", getSubCurrencies, ctx);
 
-            // const isSubscribed = await CurrencyController.checkSubscription(ctx, 'callback');
-            //
-            // if (isSubscribed) return ctx.reply("Already subscribed")
+            const isSubscribed = await CurrencyController.checkSubscription(ctx);
+
+            if (isSubscribed) return ctx.reply("Already subscribed")
 
             ctx.reply("You will receive rate of this currency everyday at 10:00 AM and 07:00 PM");
 
@@ -25,7 +25,7 @@ class UserSubscriptions {
 
     async getSubscriptions(ctx) {
         try {
-            const userSubscriptions = await CurrencyController.getCurrenciesByUser(ctx, 'message');
+            const userSubscriptions = await CurrencyController.getCurrenciesByUser(ctx);
             const menu = ArrayFilter.createButtons(userSubscriptions, 3, null, 'back')
 
             ctx.reply('Below', Markup.keyboard(menu).resize())

@@ -1,14 +1,20 @@
 const db = require("../db.js");
+const {getUserId} = require('../helpers/user.info')
 
 class UserController {
     async createUser(ctx) {
-        const name = ctx.update.message.from.first_name;
-        const telegram_id = +ctx.update.message.from.id;
+        try {
+            const name = ctx.update.message.from.first_name;
+            const telegram_id = getUserId(ctx);
 
-        await db.query(`INSERT INTO person (name, telegram_id) values ($1, $2) RETURNING *`, [name, telegram_id]);
-        return console.log(`User ${name} was successfully added`);
+            await db.query(`INSERT INTO person (name, telegram_id) values ($1, $2) RETURNING *`, [name, telegram_id]);
+            return console.log(`User ${name} was successfully added`);
+        } catch (error) {
+            console.log(error)
+        }
     }
 
+    //TODO: - подумать нужны ли мне вообще методы getUsers, getOneUser
     async getUsers(req, res) {
         const users = await db.query("SELECT * FROM person");
         res.json(users.rows);
@@ -21,9 +27,13 @@ class UserController {
     }
 
     async deleteUser(ctx) {
-        const telegram_id = +ctx.update.message.from.id;
-        await db.query("DELETE FROM person where telegram_id = $1", [telegram_id]);
-        console.log(`User ${telegram_id} is successfully deleted`)
+        try {
+            const telegram_id = getUserId(ctx);
+            await db.query("DELETE FROM person where telegram_id = $1", [telegram_id]);
+            console.log(`User ${telegram_id} is successfully deleted`)
+        } catch (error) {
+            console.log(error)
+        }
     }
 }
 

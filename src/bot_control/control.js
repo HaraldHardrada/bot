@@ -1,3 +1,4 @@
+//TODO: - добавить роли админ и юзер
 const {Telegraf} = require("telegraf");
 
 const token = require('../../token');

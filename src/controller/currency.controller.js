@@ -1,54 +1,66 @@
 const db = require('../db.js')
 const CURRENCIES = require("../currencies");
+const {getUserId, getSymbol} = require('../helpers/user.info')
 
-//TODO: - сделать универсальный метод определения типа запроса message или callback_query
-//      - и использовать его везде, потому что заебала хуйня ломаться, маму ее трахал
-//TODO: try ... catch
 class CurrencyController {
     async addCurrency(ctx) {
-        const symbol = CURRENCIES.map((item) => ctx.update.callback_query.message.text.match(item)).join("");
-        const userId = +ctx.update.callback_query.from.id;
+        try {
+            const symbol = getSymbol(ctx);
+            const userId = getUserId(ctx);
 
-        await db.query(`INSERT INTO currencies (symbol, user_id) values ($1, $2) RETURNING *`, [symbol, userId])
-        return console.log(`currency was successfully added to user ${userId}`)
+            await db.query(`INSERT INTO currencies (symbol, user_id) values ($1, $2) RETURNING *`, [symbol, userId])
+            return console.log(`currency was successfully added to user ${userId}`)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    async getCurrenciesByUser(ctx, type = 'message') {
-        let userId;
+    async getCurrenciesByUser(ctx) {
+        try {
+            const userId = getUserId(ctx);
 
-        if (type === 'callback') userId = +ctx.update.callback_query.from.id;
-        if (type === 'message') userId = +ctx.update.message.from.id;
+            const request = await db.query(`SELECT * FROM currencies WHERE user_id = $1`, [userId])
 
-        const request = await db.query(`SELECT * FROM currencies WHERE user_id = $1`, [userId])
-
-        return request.rows.map(item => item.symbol)
+            return request.rows.map(item => item.symbol)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async deleteUserCurrencies(ctx) {
-        const userId = +ctx.update.message.from.id;
-        await db.query(`DELETE FROM currencies WHERE user_id = $1`, [userId])
-        return console.log(`currencies was successfully deleted from user ${userId}`)
+        try {
+            const userId = getUserId(ctx);
+
+            await db.query(`DELETE FROM currencies WHERE user_id = $1`, [userId])
+
+            return console.log(`currencies was successfully deleted from user ${userId}`)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async deleteUserCurrency(ctx) {
-        const symbol = CURRENCIES.map((item) => ctx.update.callback_query.message.text.match(item)).join("");
-        const userId = +ctx.update.callback_query.from.id;
+        try {
+            const symbol = CURRENCIES.map((item) => ctx.update.callback_query.message.text.match(item)).join("");
+            const userId = +ctx.update.callback_query.from.id;
 
-        await db.query(`DELETE FROM currencies WHERE symbol = $1 AND user_id = $2 `, [symbol, userId])
-        ctx.reply(`You successfully unsubscribed from ${symbol}`)
+            await db.query(`DELETE FROM currencies WHERE symbol = $1 AND user_id = $2 `, [symbol, userId])
+            ctx.reply(`You successfully unsubscribed from ${symbol}`)
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    async checkSubscription(ctx, type = 'message') {
-        let symbol = ctx.update.message.text;
-        let userId = +ctx.update.message.from.id;
+    async checkSubscription(ctx) {
+        try {
+            const userId = getUserId(ctx);
+            const symbol = getSymbol(ctx);
 
-        console.log(ctx.update)
-        if (type === 'callback') {
-            symbol = CURRENCIES.map((item) => ctx.update.callback_query.message.text.match(item)).join("");
-            userId = +ctx.update.callback_query.from.id;
+            const query = await db.query(`SELECT * FROM currencies WHERE user_id = $1 AND symbol = $2`, [userId, symbol]);
+            return query.rows.length !== 0
+        } catch (error) {
+            console.log(error)
         }
-        const query = await db.query(`SELECT * FROM currencies WHERE user_id = $1 AND symbol = $2`, [userId, symbol]);
-        return query.rows.length !== 0
     }
 }
 

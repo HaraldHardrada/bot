@@ -26,7 +26,7 @@ const getAllCurrencies = async () => {
 
 const getSubCurrencies = async ctx => {
     try {
-        const userCurrencies = await currencyController.getCurrenciesByUser(ctx, 'callback');
+        const userCurrencies = await currencyController.getCurrenciesByUser(ctx);
 
         if (userCurrencies.length === 0) return;
 
