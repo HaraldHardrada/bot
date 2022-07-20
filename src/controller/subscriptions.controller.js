@@ -1,9 +1,11 @@
+const {Markup} = require("telegraf");
+
 const {getSubCurrencies} = require("../requests");
 const {startSchedule} = require('../helpers/cron');
 const ArrayFilter = require("../helpers/arrays");
 
 const CurrencyController = require("./currency.controller");
-const {Markup} = require("telegraf");
+
 
 class UserSubscriptions {
     async subscribe(ctx) {
