@@ -40,17 +40,20 @@ const showChosen = ctx => {
 const goBack = ctx => ctx.reply('back', START_MENU);
 
 //bot.on
-//TODO: - добавить шоб текст читался нормально (toUpperCase, например)
+//TODO: - подумать, как сделать так, чтобы можно было парсить, например, bitcoin как BTC
 const turnedOn = async ctx => {
-    const text = ctx.update.message.text;
+    const text = ctx.update.message.text.toUpperCase();
     if (CURRENCIES.includes(text)) {
-        ``
         const response = await getCurrency(text);
         return ctx.replyWithHTML(`${text} rate: ${response.toFixed(4)} usd`,
             await UserSubscriptions.getButtonBySubStatus(ctx))
     }
 
-    return ctx.reply('Doesn\'t exists');
-}
+    return ctx.reply(`Bot can understand your message.
+Please type like in example: 
+BTC / btc
+    `)}
 
 module.exports = {start, stop, getAllRates, showChosen, goBack, turnedOn};
+
+
