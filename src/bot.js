@@ -4,18 +4,16 @@ const {bot} = require('./bot_control/control.js')
 const userRouter = require('./routes/user.routes')
 const currencyRouter = require('./routes/currency.routes')
 
-const PORT = process.env.PORT || 8000
+//const HOST = 'crypto-rates-bot.herokuapp.com'
+const PORT = process.env.PORT || 8080
 const app = express()
 
 app.use(express.json())
-app.use('/crypto-rates-bot', userRouter)
-app.use('/crypto-rates-bot', currencyRouter)
+app.use('/api', userRouter)
+app.use('/api', currencyRouter)
 
+app.listen(PORT, () => console.log("server started"))
 
-app.listen(PORT, () => console.log(`server has been started on port ${PORT}`))
-
-// console.log(JSON.stringify(bot, '', 3))
-// bot.start(ctx => ctx.reply('Hello'));
 bot.launch();
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
