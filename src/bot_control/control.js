@@ -3,7 +3,7 @@ const {Telegraf} = require("telegraf");
 
 const token = require('../../token');
 
-const userSubscriptions = require('../controller/subscriptions.controller')
+const subscriptions = require('../helpers/subscriptions')
 
 const callbacks = require("./commands");
 
@@ -12,10 +12,10 @@ const bot = new Telegraf(token);
 bot.hears('back', callbacks.goBack)
 bot.hears('Choose', callbacks.showChosen)
 bot.hears('Show all', callbacks.getAllRates)
-bot.hears('Subscriptions', userSubscriptions.getSubscriptions)
+bot.hears('Subscriptions', subscriptions.getSubscriptions)
 
-bot.action('sub', userSubscriptions.subscribe)
-bot.action('unSub', userSubscriptions.unsubscribe)
+bot.action('sub', subscriptions.subscribe)
+bot.action('unSub', subscriptions.unsubscribe)
 
 bot.command('start', callbacks.start)
 bot.command('get_rates', callbacks.getAllRates)

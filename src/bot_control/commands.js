@@ -3,7 +3,7 @@ const {Markup} = require("telegraf");
 const ArrayFilter = require('../helpers/arrays')
 const CurrencyController = require("../controller/currency.controller");
 const UserController = require("../controller/user.controller");
-const UserSubscriptions = require('../controller/subscriptions.controller')
+const subscriptions = require('../helpers/subscriptions')
 const {getCurrency, getAllCurrencies} = require("../requests");
 const CURRENCIES = require("../currencies");
 
@@ -46,7 +46,7 @@ const turnedOn = async ctx => {
     if (CURRENCIES.includes(text)) {
         const response = await getCurrency(text);
         return ctx.replyWithHTML(`${text} rate: ${response.toFixed(4)} usd`,
-            await UserSubscriptions.getButtonBySubStatus(ctx))
+            await subscriptions.getButtonBySubStatus(ctx))
     }
 
     return ctx.reply(`Bot can understand your message.

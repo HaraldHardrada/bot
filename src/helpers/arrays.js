@@ -9,26 +9,15 @@ class ArrayFilter {
     createButtons(array, quanInRow, next = 'next', back = 'back') {
         const copy = Array.from(array)
 
-        if (next) copy.push(next);
-        if (back) copy.push(back);
+        return copy.reduce(
+            (a, c, i) => {
+                i > 0 && i % quanInRow === 0 && a.push([]);
+                a.at(-1).push(c);
 
-        return copy.reduce((acc, curr, i) => {
-            if (i === 0) {
-                acc.push([curr]);
-                return acc;
-            }
-
-            if (i % quanInRow === 0) {
-                acc.push([]);
-                acc.at(-1).push(curr);
-
-                return acc;
-            }
-
-            acc.at(-1).push(curr);
-
-            return acc;
-        }, []);
+                return a;
+            },
+            [[]]
+        );
     }
 }
 

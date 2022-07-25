@@ -4,7 +4,6 @@ const {bot} = require('./bot_control/control.js')
 const userRouter = require('./routes/user.routes')
 const currencyRouter = require('./routes/currency.routes')
 
-//const HOST = 'crypto-rates-bot.herokuapp.com'
 const PORT = process.env.PORT || 8080
 const app = express()
 
