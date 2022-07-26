@@ -1,24 +1,72 @@
-const axios = require('../axios')
 const {startSchedule} = require('../helpers/cron')
-const subscriptions = require('../helpers/subscriptions')
-const ArrayFilter = require("../helpers/arrays");
-const CURRENCIES = require("../currencies");
-c
+const {getAllCurrencies} = require("../requests");
 
 let dailyRates = [];
+let eveningRates = [];
 
-const compare = (res, req) => {
+/**
+ * функция принимает 2 массива (dailyRates и eveningRates) высчитывает коэффициенты разницы
+ * между курсами валют и возвращает массив с валютами, курсы которых изменились на 5%+
+ *
+ * @param array1
+ * @param array2
+ *
+ * @returns null или массив строк
+ */
+const calcDeltaOverPct = (array1, array2) => {
     const regex = /\d+\.\d+/;
-    let changed = [];
-    req.map((item, i, a) => {
-        const cof = parseFloat(item.match(regex)) / parseFloat(res[i].match(regex))
-        cof > 1.05 && changed.push(item + (`(⬆️ ${((cof - 1) * 100).toFixed(2)}%)`))
-        cof < 0.95 && changed.push(item + (`(⬇️ ${((1 - cof) * 100).toFixed(2)}%)`))
+    let compared = [];
+    array2.map((item, i) => {
+        const cof = parseFloat(item.match(regex)) / parseFloat(array1[i].match(regex))
+        cof > 1.05 && compared.push((` ⬆️ ${((cof - 1) * 100).toFixed(2)}% `) + item)
+        cof < 0.95 && compared.push((` ⬇️ ${((1 - cof) * 100).toFixed(2)}% `) + item)
     })
-    return changed
+    return compared.length === 0 ? null : compared;
 }
 
-const updateDaily = () => {
-    startSchedule('')
+const updateDailyRates = () => {
+    const func = async () => {
+        return dailyRates = await getAllCurrencies();
+    }
 
+    dailyRates.length === 0 && func()
+
+    return startSchedule('0 10 * * *', func)
 }
+
+const updateEveningRates = () => {
+    const func = async () => {
+        return eveningRates = await getAllCurrencies();
+    }
+    return startSchedule('0 20 * * *', func)
+}
+
+const morningAlert = (ctx) => {
+    const func = () => {
+        if (calcDeltaOverPct(eveningRates, dailyRates) === null) return;
+        return ctx.reply(`This currencies has changed MORNING:\n
+${calcDeltaOverPct(eveningRates, dailyRates).join('\n\n')}`)
+    }
+    return startSchedule('05 10 * * *', func)
+}
+
+const eveningAlert = (ctx) => {
+    const func = () => {
+        if (calcDeltaOverPct(dailyRates, eveningRates) === null) return;
+        return ctx.reply(`This currencies has changed EVENING:\n 
+${calcDeltaOverPct(dailyRates, eveningRates).join('\n\n')}`)
+    }
+
+    return startSchedule('05 20 * * *', func)
+}
+
+const startUpdRates = async () => {
+    try {
+        await updateDailyRates();
+        await updateEveningRates();
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+module.exports = {startUpdRates, eveningAlert, morningAlert}

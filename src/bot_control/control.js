@@ -1,8 +1,6 @@
-//TODO: - добавить роли админ и юзер
 const {Telegraf} = require("telegraf");
 
 const token = require('../../token');
-
 const subscriptions = require('../helpers/subscriptions')
 
 const callbacks = require("./commands");

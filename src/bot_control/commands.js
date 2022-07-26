@@ -1,5 +1,7 @@
 const {Markup} = require("telegraf");
 
+const alerts = require('./alerts')
+
 const ArrayFilter = require('../helpers/arrays')
 const CurrencyController = require("../controller/currency.controller");
 const UserController = require("../controller/user.controller");
@@ -12,7 +14,6 @@ const START_MENU = Markup.keyboard([['Show all', 'Choose'], ['Subscriptions']]).
 //commands
 const start = async ctx => {
     ctx.reply("Hello", START_MENU);
-
     try {
         await UserController.createUser(ctx);
     } catch (error) {
@@ -43,16 +44,26 @@ const goBack = ctx => ctx.reply('back', START_MENU);
 //TODO: - подумать, как сделать так, чтобы можно было парсить, например, bitcoin как BTC
 const turnedOn = async ctx => {
     const text = ctx.update.message.text.toUpperCase();
-    if (CURRENCIES.includes(text)) {
-        const response = await getCurrency(text);
-        return ctx.replyWithHTML(`${text} rate: ${response.toFixed(4)} usd`,
-            await subscriptions.getButtonBySubStatus(ctx))
-    }
+    try {
+        await alerts.startUpdRates();
+        await alerts.morningAlert(ctx);
+        await alerts.eveningAlert(ctx);
 
-    return ctx.reply(`Bot can understand your message.
+        if (CURRENCIES.includes(text)) {
+            const response = await getCurrency(text);
+
+            return ctx.replyWithHTML(`${text} rate: ${response.toFixed(4)} usd`,
+                await subscriptions.getButtonBySubStatus(ctx))
+        }
+
+        return ctx.reply(`Bot can understand your message.
 Please type like in example: 
 BTC / btc
-    `)}
+    `)
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 module.exports = {start, stop, getAllRates, showChosen, goBack, turnedOn};
 
