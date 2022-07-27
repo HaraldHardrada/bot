@@ -7,7 +7,7 @@ const API_KEYS = ['BF09A3E0-DD14-4D51-B199-AF54015CF579',
 
 module.exports = axios.create({
     baseURL: 'https://rest.coinapi.io/v1',
-    headers: {'X-CoinAPI-Key': API_KEYS[4]},
+    headers: {'X-CoinAPI-Key': API_KEYS[1]},
 })
 
 

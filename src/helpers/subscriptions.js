@@ -1,15 +1,16 @@
 const {Markup} = require("telegraf");
 
-const {getSubCurrencies} = require("../requests");
+const responses = require('../requests/responses')
 const {startSchedule} = require('./cron');
 const ArrayFilter = require("./arrays");
 
 const CurrencyController = require("../controller/currency.controller");
 
+
 const subscribe = async (ctx) => {
     try {
         //sends client's subscriptions list at 10:00 and 19:00 every day "0 10,19 * * *"
-        startSchedule("0 10,19 * * *", getSubCurrencies, ctx);
+        startSchedule("0 10,19 * * *", responses.sendSubRates, ctx);
 
         const isSubscribed = await CurrencyController.checkSubscription(ctx);
 

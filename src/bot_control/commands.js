@@ -2,11 +2,11 @@ const {Markup} = require("telegraf");
 
 const alerts = require('./alerts')
 
-const ArrayFilter = require('../helpers/arrays')
+const responses = require('../requests/responses')
+const arrayHelpers = require('../helpers/arrays')
 const CurrencyController = require("../controller/currency.controller");
 const UserController = require("../controller/user.controller");
 const subscriptions = require('../helpers/subscriptions')
-const {getCurrency, getAllCurrencies} = require("../requests");
 const CURRENCIES = require("../currencies");
 
 const START_MENU = Markup.keyboard([['Show all', 'Choose'], ['Subscriptions']]).resize();
@@ -30,10 +30,10 @@ const stop = async ctx => {
     await UserController.deleteUser(ctx)
 };
 
-const getAllRates = async ctx => ctx.reply(await getAllCurrencies());
+const getAllRates = async ctx => ctx.reply(await responses.sendAllRates());
 
 const showChosen = ctx => {
-    const menu = ArrayFilter.createButtons(CURRENCIES, 3, null, 'back')
+    const menu = arrayHelpers.createButtons(CURRENCIES, 3, null, 'back')
 
     ctx.reply('Choose the option', Markup.keyboard(menu))
 };
@@ -50,9 +50,9 @@ const turnedOn = async ctx => {
         await alerts.eveningAlert(ctx);
 
         if (CURRENCIES.includes(text)) {
-            const response = await getCurrency(text);
+            const res = await responses.sendOneRate(text);
 
-            return ctx.replyWithHTML(`${text} rate: ${response.toFixed(4)} usd`,
+            return ctx.replyWithHTML(`${text} rate: ${res.toFixed(4)} usd`,
                 await subscriptions.getButtonBySubStatus(ctx))
         }
 

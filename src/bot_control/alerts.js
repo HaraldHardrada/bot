@@ -1,5 +1,7 @@
+//TODO: - отпиздить кал (переделать)
+
 const {startSchedule} = require('../helpers/cron')
-const {getAllCurrencies} = require("../requests");
+const requests = require("../requests/requests");
 
 let dailyRates = [];
 let eveningRates = [];
@@ -26,12 +28,14 @@ const calcDeltaOverPct = (array1, array2) => {
 
 const updateDailyRates = () => {
     const func = async () => {
-        return dailyRates = await getAllCurrencies();
+        return dailyRates = await requests.getAllCurrencies();
     }
 
     dailyRates.length === 0 && func()
 
-    return startSchedule('0 10 * * *', func)
+    startSchedule('0 10 * * *', func)
+
+    return dailyRates
 }
 
 const updateEveningRates = () => {
@@ -68,5 +72,7 @@ const startUpdRates = async () => {
         console.log(error)
     }
 }
+
+console.log(updateDailyRates())
 
 module.exports = {startUpdRates, eveningAlert, morningAlert}
